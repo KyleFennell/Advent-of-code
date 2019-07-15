@@ -10,16 +10,35 @@ public class CircularLinkedList<E> extends LinkedList<E>{
 
     @Override
     public ListIterator<E> listIterator(){
-
+        return new CLLIterator();
     }
 
-    private class CLLIterator<E> implements ListIterator<E> {
+    @Override
+    public ListIterator<E> listIterator(int index){
+        return new CLLIterator(index);
+    }
 
-        private int index =
-        public CLLIterator<E>(LinkedList<E> list){
+    @Override
+    public String toString(){
+        Iterator<E> it = super.listIterator(0);
+        String out = "";
+        while(it.hasNext()){
+            out += it.next() + " ";
+        }
+        return out;
+    }
 
+    private class CLLIterator implements ListIterator<E> {
+
+        private ListIterator<E> superIt;
+
+        private CLLIterator(){
+            superIt = CircularLinkedList.super.listIterator(0);
         }
 
+        private CLLIterator(int index){
+            superIt = CircularLinkedList.super.listIterator(index);
+        }
 
         @Override
         public boolean hasNext() {
@@ -28,7 +47,18 @@ public class CircularLinkedList<E> extends LinkedList<E>{
 
         @Override
         public E next() {
-            return null;
+//            System.out.println("next");
+            if (CircularLinkedList.super.size() == 0){
+//                System.out.println("List is empty");
+                return null;
+            }
+            if(superIt.hasNext()){
+//                System.out.println("hasNext: " + superIt.nextIndex());
+                return superIt.next();
+            }
+//            System.out.println("noNext");
+            while(superIt.hasPrevious()){superIt.previous();}
+            return superIt.next();
         }
 
         @Override
@@ -38,32 +68,50 @@ public class CircularLinkedList<E> extends LinkedList<E>{
 
         @Override
         public E previous() {
-            return null;
+//            System.out.println("previous");
+            if (CircularLinkedList.super.size() == 0){
+//                System.out.println("List is empty");
+                return null;
+            }
+            if (superIt.hasPrevious()){
+//                System.out.println("hasPrevious: " + superIt.previousIndex());
+                return superIt.previous();
+            }
+//            System.out.println("noPrevious");
+            while(superIt.hasNext()){superIt.next();}
+            return superIt.previous();
         }
 
         @Override
         public int nextIndex() {
-            return 0;
+            if (superIt.nextIndex() == CircularLinkedList.super.size()){
+                return 0;
+            }
+            return superIt.nextIndex();
         }
 
         @Override
         public int previousIndex() {
-            return 0;
+            int listSize = CircularLinkedList.super.size();
+            if (superIt.previousIndex() == -1){
+                return listSize-1;
+            }
+            return superIt.previousIndex();
         }
 
         @Override
         public void remove() {
-
+            superIt.remove();
         }
 
         @Override
         public void set(E e) {
-
+            superIt.set(e);
         }
 
         @Override
         public void add(E e) {
-
+            superIt.add(e);
         }
     }
 }
